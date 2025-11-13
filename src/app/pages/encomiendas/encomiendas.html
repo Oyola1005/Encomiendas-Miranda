@@ -1,0 +1,217 @@
+<div class="contenedor">
+  <h1>Gestión de Encomiendas</h1>
+
+  <!-- FORMULARIO -->
+  <section class="card">
+    <h2>Registrar Encomienda</h2>
+
+    <form class="form" (ngSubmit)="registrarEncomienda()">
+      <div class="grid">
+        <div>
+          <label>Origen</label>
+          <input
+            type="text"
+            placeholder="Ciudad de origen"
+            [(ngModel)]="nueva.origen"
+            name="origen"
+            required
+          />
+        </div>
+
+        <div>
+          <label>Destino</label>
+          <input
+            type="text"
+            placeholder="Ciudad de destino"
+            [(ngModel)]="nueva.destino"
+            name="destino"
+            required
+          />
+        </div>
+
+        <div>
+          <label>Remitente</label>
+          <input
+            type="text"
+            placeholder="Nombre del remitente"
+            [(ngModel)]="nueva.remitente"
+            name="remitente"
+            required
+          />
+        </div>
+
+        <div>
+          <label>Destinatario</label>
+          <input
+            type="text"
+            placeholder="Nombre del destinatario"
+            [(ngModel)]="nueva.destinatario"
+            name="destinatario"
+            required
+          />
+        </div>
+
+        <div class="full">
+          <label>Descripción de la encomienda</label>
+          <textarea
+            placeholder="Ej: Caja con documentos, frágil, etc."
+            [(ngModel)]="nueva.descripcion"
+            name="descripcion"
+            required
+          ></textarea>
+        </div>
+
+        <div>
+          <label>Peso (kg)</label>
+          <input
+            type="number"
+            step="0.1"
+            min="0"
+            [(ngModel)]="nueva.pesoKg"
+            name="pesoKg"
+          />
+        </div>
+
+        <div>
+          <label>Nombre de quien recibe</label>
+          <input
+            type="text"
+            placeholder="Nombre del receptor"
+            [(ngModel)]="nueva.receptorNombre"
+            name="receptorNombre"
+            required
+          />
+        </div>
+
+        <div>
+          <label>DNI o documento de quien recibe</label>
+          <input
+            type="text"
+            placeholder="Documento"
+            [(ngModel)]="nueva.receptorDocumento"
+            name="receptorDocumento"
+            required
+          />
+        </div>
+
+        <div>
+          <label>Método de pago</label>
+          <select [(ngModel)]="nueva.metodoPago" name="metodoPago">
+            <option value="Efectivo">Efectivo</option>
+            <option value="Yape">Yape</option>
+            <option value="Plin">Plin</option>
+            <option value="Tarjeta">Tarjeta</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="acciones-form">
+        <button type="submit">Registrar encomienda</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- BUSQUEDA -->
+  <section class="card">
+    <h2>Buscar por Código</h2>
+
+    <div class="search-box">
+      <input
+        type="text"
+        placeholder="Ej: EN-12345"
+        [(ngModel)]="codigoBuscar"
+        name="codigoBuscar"
+      />
+      <button type="button" (click)="buscarEncomienda()">Buscar</button>
+    </div>
+
+    <div *ngIf="resultadoBusqueda" class="resultado">
+      <h3>Detalle de encomienda {{ resultadoBusqueda.codigo }}</h3>
+      <p><b>Origen:</b> {{ resultadoBusqueda.origen }}</p>
+      <p><b>Destino:</b> {{ resultadoBusqueda.destino }}</p>
+      <p><b>Remitente:</b> {{ resultadoBusqueda.remitente }}</p>
+      <p><b>Destinatario:</b> {{ resultadoBusqueda.destinatario }}</p>
+      <p><b>Descripción:</b> {{ resultadoBusqueda.descripcion }}</p>
+      <p><b>Peso:</b> {{ resultadoBusqueda.pesoKg }} kg</p>
+      <p>
+        <b>Quien recibe:</b> {{ resultadoBusqueda.receptorNombre }} ({{
+          resultadoBusqueda.receptorDocumento
+        }})
+      </p>
+      <p><b>Método de pago:</b> {{ resultadoBusqueda.metodoPago }}</p>
+      <p><b>Estado:</b> {{ resultadoBusqueda.estado }}</p>
+    </div>
+
+    <p *ngIf="!resultadoBusqueda && codigoBuscar">
+      No se encontró ninguna encomienda.
+    </p>
+  </section>
+
+  <!-- LISTADO -->
+  <section class="card">
+    <h2>Listado de Encomiendas</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Origen</th>
+          <th>Destino</th>
+          <th>Destinatario</th>
+          <th>Peso (kg)</th>
+          <th>Método de pago</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let e of encomiendas">
+          <td>{{ e.codigo }}</td>
+          <td>{{ e.origen }}</td>
+          <td>{{ e.destino }}</td>
+          <td>{{ e.destinatario }}</td>
+          <td>{{ e.pesoKg }}</td>
+          <td>{{ e.metodoPago }}</td>
+          <td>
+            <select
+              [(ngModel)]="e.estado"
+              (change)="cambiarEstado(e, e.estado)"
+            >
+              <option>Pendiente</option>
+              <option>En ruta</option>
+              <option>Entregada</option>
+              <option>Cancelada</option>
+            </select>
+          </td>
+          <td class="acciones">
+            <button type="button" (click)="verQr(e)">Ver QR</button>
+            <button
+              class="btn-delete"
+              type="button"
+              (click)="eliminar(e.codigo)"
+            >
+              Eliminar
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- QR DE LA ENCOMIENDA SELECCIONADA -->
+  <section class="card" *ngIf="encomiendaQr as e">
+    <h2>QR de la encomienda {{ e.codigo }}</h2>
+    <p>
+      Escanea este código para ver los datos de la encomienda en el sistema.
+    </p>
+    <div class="qr-wrapper">
+      <img
+        [src]="getQrUrl(e)"
+        alt="QR de la encomienda"
+        width="200"
+        height="200"
+      />
+    </div>
+  </section>
+</div>
