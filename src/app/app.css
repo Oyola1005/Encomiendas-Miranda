@@ -1,0 +1,15 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Poppins", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  color: #161518; /* text-dark */
+  background: radial-gradient(circle at top, #f5f9ff 0%, #e5edf7 40%, #f9fafb 100%);
+}
+
+app-root {
+  display: block;
+  min-height: 100vh;
+}
